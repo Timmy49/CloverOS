@@ -24,7 +24,7 @@ def guessing_game():
     try:
       guess = int(input("\nGuess a number between 1 and 10 ( 0 to exit )\nAnswer: "))
     except ValueError:
-      print("Invalid input.")
+      print("\nInvalid input.")
       continue
 
     # guessing the number
@@ -35,7 +35,7 @@ def guessing_game():
     elif guess < number:
       print("Too low!")
     else:
-      print("You guessed correctly!")
+      print("\nYou guessed correctly!")
       break
 
 
@@ -47,11 +47,11 @@ def lottery_game():
   try:
     entry_number = int(input("\nWhich is the lottery number?\n" + str(numbers) + "\nAnswer: "))
     if entry_number == winning_number:
-      print("You won!")
+      print("\nYou won!")
     else:
-      print("You lost! Lottery number was " + str(winning_number))
+      print("\nYou lost! Lottery number was " + str(winning_number))
   except ValueError:
-    print("Invalid input.")
+    print("\nInvalid input.")
 
 
 # Calculator
@@ -170,17 +170,20 @@ def settingsapp():
 
 # Help
 def helpapp():
-  print("\nApplications:\n1. Guessing Game\n2. Lottery Game\n3. Bonnet\n4. Calculator\n5. Todo\n6. Notes\n7. Settings\n8. Help\n9. Exit\n\nType the name of the application to open. Most of the time, the command is simple and requires common sense.")
+  print("\nApplications:\n1. Games\n2. Notes\n3. Bonnet\n4. Calculator\n5. Todo\n6. Settings\n7. Help\n8. Exit\n\nType the name of the application to open. Commands are all common sense, for example:\nType exit to exit, and help for help!\n\nFor any bugs, please contact ['SeanliOFS@gmail.com']")
 
 """**Bonnet Game**"""
 
 # Bonnet Game
 def bonnet():
   # Game Status
+  global bonnet_admin_complex
   game_status = input("\nNew game or Continue game?\nAnswer: ").lower()
   if game_status == "new game":
+    bonnet_admin_complex = False
     bonnet_new_game()
   elif game_status == "continue game":
+    bonnet_admin_complex = False
     bonnet_import_save()
   else:
     if game_status == "exit":
@@ -349,55 +352,50 @@ def bonnet_import_save():
 
 # Bonnet - Location Text
 def location_text():
-  global player_x, player_y, progress_gui, developer_mode
+  global player_x, player_y, progress_gui, developer_mode, bonnet_admin_complex
   # Add \n before every location text!!!
   # Y = 1
   if player_x == 1 and player_y == 1:
     print("\nYou find yourself standing in the middle of a dirt road. The road leads far off to the east. There are tall palm trees on the side of the walkway.")
-    if developer_mode == True:
-      print("\nCurrent location: X = " + str(player_x) + ", Y = " + str(player_y))
   elif player_x == 2 and player_y == 1:
     print("\nThe ground is much softer here. The road leads to the east and west.")
-    if developer_mode == True:
-      print("\nCurrent location: X = " + str(player_x) + ", Y = " + str(player_y))
   elif player_x == 3 and player_y == 1:
     print("\nThere is a large pile of metal scraps here. The road leads to the east and west. You notice another small road leading south.")
-    if developer_mode == True:
-      print("\nCurrent location: X = " + str(player_x) + ", Y = " + str(player_y))
   # Y = 2
   elif player_x == 3 and player_y == 2:
     print("\nThere is a large pile of metal scraps here. ")
-    has_shovel = "shovelyes" in progress_gui
-    if has_shovel == True:
-      print("\nThere is a shovel in the pile of metal scraps.")
-    if developer_mode == True:
-      print("\nCurrent location: X = " + str(player_x) + ", Y = " + str(player_y))
   # Non - Existent Text
   else:
     print("\nThere is no description for this location yet. Current location: X = " + str(player_x) + ", Y = " + str(player_y) + ".")
+  # Location XY for developer
+  if developer_mode == True:
+    if bonnet_admin_complex == True:
+      print("\nGame Status:\n\nPosition:" + str(player_x) + " " + str(player_y) + "\nFalse Position Check:" + str(false_player_x) + " " + str(false_player_y) + "\nInventory_GUI:" + str(inventory_gui) + "\nProgress_GUI:" + str(progress_gui) + "\nInventory_STR:" + str(inventory_str) + "\nProgress_STR:" + str(progress_str) + "\nItem STR List:\n1k2s3b4c5ks6kb7kc8ksb9kscAkbc\nBksbcCsbDscEscbFbc\nProgress STR List:\n1shovelyes")
+    else:
+      print("\nCurrent location: X = " + str(player_x) + ", Y = " + str(player_y))
 # Bonnet - Action + Game Engine
 def location_action():
-  global player_x, player_y, inventory_gui, progress_gui, inventory_str, progress_str, bonnet_action, developer_mode
+  global player_x, player_y, false_player_x, false_player_y, inventory_gui, progress_gui, inventory_str, progress_str, bonnet_action, developer_mode, bonnet_admin_complex
   while True:
     bonnet_action = input("\nWhat would you like to do?\nAnswer: ").lower()
     # Movement
-    # Important Note: Player starts bottom left of map. North is + 1Y, East is + 1X
+    false_player_x = player_x
+    false_player_y = player_y
+    # Important Note: Player starts bottom left of map. South is + 1Y, East is + 1X
     if bonnet_action == "east":
-      player_x += 1
-      location_text()
-      location_action()
+      false_player_x = player_x + 1
+      run_movement()
     elif bonnet_action == "west":
-      player_x -= 1
-      location_text()
-      location_action()
+      false_player_x = player_x - 1
+      run_movement()
     elif bonnet_action == "south":
-      player_y -= 1
-      location_text()
-      location_action()
+      false_player_y = player_y + 1
+      run_movement()
     elif bonnet_action == "north":
-      player_y += 1
-      location_text()
-      location_action()
+      false_player_y = player_y - 1
+      run_movement()
+
+
     # Inventory Command
     elif bonnet_action == "inventory":
       print(str(inventory_gui))
@@ -446,8 +444,8 @@ def location_action():
     # Admin Command
     elif bonnet_action == "admin":
       if developer_mode == True:
-        print("\nGame Status:\n\nPosition:" + str(player_x) + " " + str(player_y) + "\nInventory_GUI:" + str(inventory_gui) + "\nProgress_GUI:" + str(progress_gui) + "\nInventory_STR:" + str(inventory_str) + "\nProgress_STR:" + str(progress_str) + "\nItem STR List:\n1k2s3b4c5ks6kb7kc8ksb9kscAkbc\nBksbcCsbDscEscbFbc\nProgress STR List:\n1shovelyes")
-        add_type = input("\nItem / Progress ( I / P )\nAnswer: ").lower()
+        print("\nGame Status:\n\nPosition:" + str(player_x) + " " + str(player_y) + "\nFalse Position Check:" + str(false_player_x) + " " + str(false_player_y) + "\nInventory_GUI:" + str(inventory_gui) + "\nProgress_GUI:" + str(progress_gui) + "\nInventory_STR:" + str(inventory_str) + "\nProgress_STR:" + str(progress_str) + "\nItem STR List:\n1k2s3b4c5ks6kb7kc8ksb9kscAkbc\nBksbcCsbDscEscbFbc\nProgress STR List:\n1shovelyes")
+        add_type = input("\nItem / Progress / Debug Mode ( I / P / D )\nAnswer: ").lower()
         if add_type == "i":
           add_item = str(input("\nItem? \n1k2s3b4c5ks6kb7kc8ksb9kscAkbc\nBksbcCsbDscEscbFbc\nAnswer: "))
           try:
@@ -514,8 +512,19 @@ def location_action():
           print("\nComplete. Current progress:" + str(progress_gui))
           location_text()
           location_action()
+        elif add_type == "d":
+          if bonnet_admin_complex == True:
+            bonnet_admin_complex = False
+            print("\nDebug Mode Off.")
+            location_text()
+            location_action()
+          else:
+            print("\nDebug Mode On.")
+            bonnet_admin_complex = True
+            location_text()
+            location_action()
         else:
-          print("Invalid Action. ( I / P)")
+          print("\nExited Admin.")
           location_text()
           location_action()
       else:
@@ -534,11 +543,63 @@ def location_action():
         print("\nInvalid Action. ( Turn on developer mode )")
         location_text()
         location_action()
+    # Help
+    elif bonnet_action == "help":
+      print("\nBonnet is a text based adventure game inspired by Dunnet ( Emacs ).\nList of commands:\n1. Move ( Type the direction to move, eg. 'north' to move north. )\n2. Inventory ( Type: 'inventory' )\n3. Special Actions:\n   'Dig'\n   'Climb Tree'\n   'Open <Object> / <Item>' to interact")
+      location_text()
+      location_action()
 
+
+    # Refresh False XY
+    elif bonnet_action == "refresh":
+      if developer_mode == True:
+        print()
+        location_text()
+        location_action()
+      else:
+        print("\nInvalid Action.")
+        location_text()
+        location_action()
 
     # Invalid Command
     else:
       print("\nInvalid Action.")
+      location_text()
+      location_action()
+
+# Check Player Movement
+def run_movement():
+  global player_x, player_y, false_player_x, false_player_y
+  # Out of bounds?
+  if false_player_x < 1:
+    print("\nYou cannot move that way.")
+    location_text()
+    location_action()
+  elif false_player_y < 1:
+    print("\nYou cannot move that way.")
+    location_text()
+    location_action()
+  elif false_player_x > 12:
+    print("\nYou cannot move that way.")
+    location_text()
+    location_action()
+  elif false_player_y > 12:
+    print("\nYou cannot move that way.")
+    location_text()
+    location_action()
+  # Walls? Can't move?
+  elif false_player_x in [1, 2] and false_player_y == 2:
+    print("\nYou cannot move that way. ( Tip: Follow the road )")
+    location_text()
+    location_action()
+  # Check if X or Y moved, executes movement
+  else:
+    if false_player_x == player_x + 1 or false_player_x == player_x - 1:
+      player_x = false_player_x
+      location_text()
+      location_action()
+    elif false_player_y == player_y + 1 or false_player_y == player_y - 1:
+      player_y = false_player_y
       location_text()
       location_action()
 
@@ -557,10 +618,15 @@ def home_screen():
         break
       else:
         continue
-    if application == "guessing game":
-      guessing_game()
-    elif application == "lottery game":
-      lottery_game()
+    if application == "games":
+      print("\nAvailable games currently:\n1. Lottery game\n2. Guessing game")
+      game_selection = input("\nSelect a game\nAnswer: ").lower()
+      if game_selection == "1":
+        lottery_game()
+      elif game_selection == "2":
+        guessing_game()
+      else:
+        print("Invalid Action.")
     elif application == "bonnet":
       bonnet()
     elif application == "calculator":
@@ -582,7 +648,7 @@ def home_screen():
     else:
       print("\nInvalid Application.")
 
-def type_text(text, delay=0.05):
+def type_text(text, delay=0.02):
   for char in text:
     sys.stdout.write(char)
     sys.stdout.flush()
@@ -590,13 +656,7 @@ def type_text(text, delay=0.05):
   print()
 
 # BIOS
-skip_bios = input("developer?")
-if skip_bios == " ":
-  home_screen()
-else:
-  time.sleep(1)
-  type_text("\nPowering on...")
-  time.sleep(1.4)
-  type_text("\nWelcome to Clover OS, an operating system powered by python script. To start, select an application.")
-  time.sleep(0.4)
-  home_screen()
+type_text("\nWelcome to Clover OS, an operating system powered by python script. To start, select an application. ( Type: 'Help' )")
+time.sleep(0.5)
+home_screen()
+
