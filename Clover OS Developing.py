@@ -846,7 +846,7 @@ def home_screen():
       elif game_selection == "2":
         guessing_game()
       else:
-        print("Invalid Action.")
+        print("\nInvalid Action.")
     elif application == "bonnet":
       bonnet()
     elif application == "calculator":
